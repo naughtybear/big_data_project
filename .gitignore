@@ -1,3 +1,4 @@
 *.csv
 movie_data/
 model/
+__pycache__/

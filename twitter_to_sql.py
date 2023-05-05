@@ -45,7 +45,7 @@ def get_twitter_movie_raw_data(cur, conn, engine):
     api = get_twitter_data()
     max_id = 2650506631677968385
     current_id = api.get_current_id()
-    time.sleep(0.5)
+    time.sleep(1.5)
     count = 0
 
     while True:
@@ -142,8 +142,10 @@ def get_twitter_cast_raw_data(cur, conn, engine):
         cur.execute(query)
         conn.commit()
         print(count)
+        if count > 3000:
+            break
 
-def get_movie_raw_sentiment(cur, conn, engine):
+def get_cast_raw_sentiment(cur, conn, engine):
     query = "SELECT t1.id, t1.text\
             FROM twitter_cast_raw_data t1\
             Where score is NULL\
@@ -151,16 +153,38 @@ def get_movie_raw_sentiment(cur, conn, engine):
     cur.execute(query)
     data = cleaner(cur.fetchall())
     df = pd.DataFrame(data, columns = ['id', 'text'])
-    trainer = twitter_sentiment("drive/MyDrive/Colab Notebooks/model/bert_v2")
+    trainer = twitter_sentiment("model/bert_v2")
 
     df["score"] = trainer.predict(df)
     for i in range(32):
         query = f"update twitter_cast_raw_data\
             set score = {df.iloc[i]['score']}\
             where twitter_cast_raw_data.id = {df.iloc[i]['id']}"
-        print(query)
+        # print(query)
         cur.execute(query)
         conn.commit()
+
+    return len(data)
+
+def get_movie_raw_sentiment(cur, conn, model):
+    query = "SELECT t1.id, t1.text\
+            FROM twitter_movie_raw_data t1\
+            Where score is NULL\
+            limit 32"
+    cur.execute(query)
+    data = cleaner(cur.fetchall())
+    df = pd.DataFrame(data, columns = ['id', 'text'])
+
+    df["score"] = model.predict(df)
+    for i in range(32):
+        query = f"update twitter_movie_raw_data\
+            set score = {df.iloc[i]['score']}\
+            where twitter_movie_raw_data.id = {df.iloc[i]['id']}"
+        # print(query)
+        cur.execute(query)
+        conn.commit()
+
+    return len(data)
 
 def cleaner(tweets):
     result = []
@@ -173,11 +197,22 @@ def cleaner(tweets):
         result.append([tweet[0], tmp_tweet])
 
     return result
+
+def get_sentiment_model(path = "model/bert_v2"):
+    return twitter_sentiment(path)
     
 if __name__ == "__main__":
     cur, conn, engine = connect_sql()
+
+    # get cast twitter with twitter api
     for i in range(100):
         get_twitter_cast_raw_data(cur, conn, engine)
-    # api = get_twitter_data()
-    # current_id = api.get_current_id()
-    # print(current_id)
+
+    # model = get_sentiment_model()
+    # total = 0
+    # while True:
+    #     length = get_movie_raw_sentiment(cur, conn, model)
+    #     print(total)
+    #     total = total + length
+    #     if(length < 32):
+    #         break

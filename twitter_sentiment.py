@@ -14,7 +14,10 @@ class twitter_sentiment():
     def __init__(self, model_path=None) -> None:
         #load pre-trained BERT
         if model_path:
-            pass
+            self.model = DistilBertForSequenceClassification.from_pretrained(model_path,
+                                                                num_labels = 3,
+                                                                output_attentions = False,
+                                                                output_hidden_states = False)
         else:
             self.model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased',
                                                                 num_labels = 3,
@@ -120,55 +123,8 @@ class twitter_sentiment():
 
         self.model.save_pretrained("drive/MyDrive/Colab Notebooks/model/bert_v2")
 
-    def predict(self, predict_data):
-        encoded_data_predict = self.tokenizer.batch_encode_plus(predict_data.text.values,
-                                                        add_special_tokens = True,
-                                                        return_attention_mask = True,
-                                                        padding = True,
-                                                        return_tensors = 'pt')
-        #encode train set
-        input_ids_predict = encoded_data_predict['input_ids']
-        attention_masks_predict = encoded_data_predict['attention_mask']
 
-        dataset_predict = TensorDataset(input_ids_predict, 
-                                    attention_masks_predict,)
-        
-        self.model.eval()
-
-        dataloader_pred = DataLoader(dataset_predict,
-                                    sampler = RandomSampler(dataset_predict),
-                                    batch_size = 32) #since we don't have to do backpropagation for this step
-
-        #tracking variables
-        loss_val_total = 0
-        predictions, true_vals = [], []
-        
-        for batch in tqdm(dataloader_pred):
-            
-            #load into GPU
-            batch = tuple(b.to(self.device) for b in batch)
-            
-            #define inputs
-            inputs = {'input_ids':      batch[0],
-                    'attention_mask': batch[1]}
-
-            #compute logits
-            with torch.no_grad():        
-                outputs = self.model(**inputs)
-
-            #compute loss
-            logits = outputs["logits"]
-
-            #compute accuracy
-            logits = logits.detach().cpu().numpy()
-            predictions.append(logits)
-
-        predictions = np.concatenate(predictions, axis=0)
-
-        return np.argmax(predictions, axis=1).flatten()
-
-
-    def evaluate(self, dataloader_val):
+    def evaluate(self, dataloader_eval):
         #evaluation mode disables the dropout layer 
         self.model.eval()
         
@@ -176,7 +132,7 @@ class twitter_sentiment():
         loss_val_total = 0
         predictions, true_vals = [], []
         
-        for batch in tqdm(dataloader_val):
+        for batch in tqdm(dataloader_eval):
             
             #load into GPU
             batch = tuple(b.to(self.device) for b in batch)
@@ -202,12 +158,59 @@ class twitter_sentiment():
             true_vals.append(label_ids)
         
         #compute average loss
-        loss_val_avg = loss_val_total/len(dataloader_val) 
+        loss_val_avg = loss_val_total/len(dataloader_eval) 
         
         predictions = np.concatenate(predictions, axis=0)
         true_vals = np.concatenate(true_vals, axis=0)
                 
         return loss_val_avg, predictions, true_vals
+      
+    def predict(self, predict_data):
+        encoded_data_predict = self.tokenizer.batch_encode_plus(predict_data.text.values,
+                                                        add_special_tokens = True,
+                                                        return_attention_mask = True,
+                                                        padding = True,
+                                                        return_tensors = 'pt')
+        #encode train set
+        input_ids_predict = encoded_data_predict['input_ids']
+        attention_masks_predict = encoded_data_predict['attention_mask']
+
+        dataset_predict = TensorDataset(input_ids_predict, 
+                                    attention_masks_predict,)
+        
+        self.model.eval()
+
+        dataloader_pred = DataLoader(dataset_predict,
+                                    sampler = RandomSampler(dataset_predict),
+                                    batch_size = 32) #since we don't have to do backpropagation for this step
+
+        #tracking variables
+        loss_val_total = 0
+        predictions, true_vals = [], []
+        
+        for batch in dataloader_pred:
+            
+            #load into GPU
+            batch = tuple(b.to(self.device) for b in batch)
+            
+            #define inputs
+            inputs = {'input_ids':      batch[0],
+                    'attention_mask': batch[1]}
+
+            #compute logits
+            with torch.no_grad():        
+                outputs = self.model(**inputs)
+
+            #compute loss
+            logits = outputs["logits"]
+
+            #compute accuracy
+            logits = logits.detach().cpu().numpy()
+            predictions.append(logits)
+
+        predictions = np.concatenate(predictions, axis=0)
+
+        return np.argmax(predictions, axis=1).flatten()
 
     def f1_score_func(self, preds, labels):
         preds_flat = np.argmax(preds, axis=1).flatten()
@@ -283,6 +286,7 @@ class twitter_sentiment():
 
     def load_data(self, data_location, names):
         return pd.read_csv(data_location, names=names).dropna()
+    
 
 if __name__ == "__main__":
     trainer = twitter_sentiment()
