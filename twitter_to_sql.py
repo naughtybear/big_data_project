@@ -45,7 +45,7 @@ def get_twitter_movie_raw_data(cur, conn, engine):
     api = get_twitter_data()
     max_id = 2650506631677968385
     current_id = api.get_current_id()
-    time.sleep(1.5)
+    time.sleep(2)
     count = 0
 
     while True:
@@ -98,7 +98,7 @@ def get_twitter_cast_raw_data(cur, conn, engine):
     api = get_twitter_data()
     max_id = 2650506631677968385
     current_id = api.get_current_id()
-    time.sleep(0.5)
+    time.sleep(2)
     
     count = 0
 
@@ -138,6 +138,66 @@ def get_twitter_cast_raw_data(cur, conn, engine):
         query = f"update twitter_cast_score\
             set tweet_count = tweet_count + {len(cast_tweets.index)}\
             where twitter_cast_score.id = {twitter_list[0][0]}"
+        print(query)
+        cur.execute(query)
+        conn.commit()
+        print(count)
+        if count > 3000:
+            break
+
+def get_twitter_director_raw_data(cur, conn, engine):
+    query = "SELECT t1.id, t1.director_name, t1.tweet_end_id\
+        FROM twitter_director_score t1\
+        where t1.tweet_end_id = 0\
+        limit 1"
+    cur.execute(query)
+    twitter_list = cur.fetchall()
+    # 
+    # print(twitter_list[0][0])
+    # input()
+    api = get_twitter_data()
+    max_id = 2650506631677968385
+    current_id = api.get_current_id()
+    time.sleep(2)
+    
+    count = 0
+
+    # print(current_id)
+    while True:
+        print(twitter_list)
+        try:
+            director_tweets = api.get_search_data(twitter_list[0][1], max_id = max_id)
+        except tweepy.errors.TwitterServerError as e:
+            # Handle the error
+            print("Twitter server error occurred: ", e)
+            continue
+
+        if director_tweets is None:
+            if count == 0:
+                query = f"update twitter_director_score\
+                    set tweet_end_id = {current_id}\
+                    where twitter_director_score.id = {twitter_list[0][0]}"
+                print(query)
+                cur.execute(query)
+                conn.commit()
+            break
+
+        max_id = director_tweets.iloc[-1].tweet_id - 1
+        director_tweets['director_id'] = twitter_list[0][0]
+        director_tweets.to_sql("twitter_director_raw_data", engine, if_exists="append", index=False)
+
+        if count == 0 and director_tweets.iloc[0].tweet_id + 1 > twitter_list[0][2]:
+            query = f"update twitter_director_score\
+                set tweet_end_id = {director_tweets.iloc[0].tweet_id + 1}\
+                where twitter_director_score.id = {twitter_list[0][0]}"
+            print(query)
+            cur.execute(query)
+            conn.commit()
+
+        count = count + len(director_tweets.index)
+        query = f"update twitter_director_score\
+            set tweet_count = tweet_count + {len(director_tweets.index)}\
+            where twitter_director_score.id = {twitter_list[0][0]}"
         print(query)
         cur.execute(query)
         conn.commit()
@@ -186,6 +246,26 @@ def get_movie_raw_sentiment(cur, conn, model):
 
     return len(data)
 
+def get_director_raw_sentiment(cur, conn, model):
+    query = "SELECT t1.id, t1.text\
+            FROM twitter_director_raw_data t1\
+            Where score is NULL\
+            limit 32"
+    cur.execute(query)
+    data = cleaner(cur.fetchall())
+    df = pd.DataFrame(data, columns = ['id', 'text'])
+
+    df["score"] = model.predict(df)
+    for i in range(32):
+        query = f"update twitter_director_raw_data\
+            set score = {df.iloc[i]['score']}\
+            where twitter_director_raw_data.id = {df.iloc[i]['id']}"
+        # print(query)
+        cur.execute(query)
+        conn.commit()
+
+    return len(data)
+
 def cleaner(tweets):
     result = []
     for tweet in tweets:
@@ -206,7 +286,7 @@ if __name__ == "__main__":
 
     # get cast twitter with twitter api
     for i in range(100):
-        get_twitter_cast_raw_data(cur, conn, engine)
+        get_twitter_director_raw_data(cur, conn, engine)
 
     # model = get_sentiment_model()
     # total = 0
