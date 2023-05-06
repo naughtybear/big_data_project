@@ -9,6 +9,13 @@ import tweepy
 import time
 
 def connect_sql():
+    '''
+    built connection to postgres by psycopg2 and sqlalchemy
+    return:
+        cur: psycopg2 cursor
+        conn: psycopg2 connection
+        engine: sqlalchemy engine
+    '''
     conn = psycopg2.connect(
         host="34.30.45.126",
         port=5432,
@@ -31,17 +38,35 @@ def connect_sql():
     )
     return cur, conn, engine
 
-def get_twitter_movie_raw_data(cur, conn, engine):
-    query = "SELECT t1.id, t1.movie_title, t1.release_date, t1.tweet_end_id\
-        FROM twitter_movie_score t1\
-        where t1.release_date is not NULL and t1.tweet_end_id = 0\
-        order by t1.release_date DESC\
-        limit 1"
+def get_twitter_movie_raw_data(cur, conn, engine, movie_id=None):
+    '''
+    Get the twitter data from twitter search api and store it to prosgres sql.
+    It will return after getting more than 3000 tweets per moive to accelerate the speed to get data from every movie.
+
+    parameters:
+        cur: psycopg2 cursor
+        conn: psycopg2 connection
+        engine: sqlalchemy engine
+        movie_id: get the movie data from this movie id. If movie id is None, will get the tweets for those movie have no data.
+    return:
+        twitter_list[0][0]: the movie_id get the tweets
+    '''
+    # get the movie data from twitter_movie_score
+    if movie_id is None:
+        query = "SELECT t1.id, t1.movie_title, t1.release_date, t1.tweet_end_id\
+            FROM twitter_movie_score t1\
+            where t1.release_date is not NULL and t1.tweet_end_id = 0\
+            order by t1.release_date DESC\
+            limit 1"
+    else:
+        query = f"SELECT t1.id, t1.movie_title, t1.release_date, t1.tweet_end_id\
+            FROM twitter_movie_score t1\
+            where t1.id >= {movie_id}\
+            limit 1"
+
     cur.execute(query)
     twitter_list = cur.fetchall()
-    # 
-    # print(twitter_list[0][0])
-    # input()
+
     api = get_twitter_data()
     max_id = 2650506631677968385
     current_id = api.get_current_id()
@@ -56,12 +81,19 @@ def get_twitter_movie_raw_data(cur, conn, engine):
             movie_tweets = api.get_search_data(twitter_list[0][1], max_id = max_id)
         if movie_tweets is None:
             if count == 0:
-                query = f"update twitter_movie_score\
-                    set tweet_end_id = {current_id}\
-                    where twitter_movie_score.id = {twitter_list[0][0]}"
+                if current_id is not None:
+                    query = f"update twitter_movie_score\
+                        set tweet_end_id = {current_id}\
+                        where twitter_movie_score.id = {twitter_list[0][0]}"
+                else:
+                    print("default twitter end id")
+                    query = f"update twitter_cast_score\
+                        set tweet_end_id = 1654959876240441345\
+                        where twitter_cast_score.id = {twitter_list[0][0]}"
                 print(query)
                 cur.execute(query)
                 conn.commit()
+                
             break
 
         max_id = movie_tweets.iloc[-1].tweet_id - 1
@@ -84,17 +116,38 @@ def get_twitter_movie_raw_data(cur, conn, engine):
         cur.execute(query)
         conn.commit()
         print(count)
+        if count > 3000:
+            break
+    
+    return twitter_list[0][0]
 
-def get_twitter_cast_raw_data(cur, conn, engine):
-    query = "SELECT t1.id, t1.cast_name, t1.tweet_end_id\
-        FROM twitter_cast_score t1\
-        where t1.tweet_end_id = 0\
-        limit 1"
+def get_twitter_cast_raw_data(cur, conn, engine, cast_id=None):
+    '''
+    Get the twitter data from twitter search api and store it to prosgres sql.
+    It will return after getting more than 3000 tweets per cast to accelerate the speed to get data from every cast.
+
+    parameters:
+        cur: psycopg2 cursor
+        conn: psycopg2 connection
+        engine: sqlalchemy engine
+        cast_id: get the cast data from this cast id. If cast id is None, will get the tweets for those cast have no data.
+    return:
+        twitter_list[0][0]: the cast_id that get the tweets
+    '''
+    if cast_id is None:
+        query = "SELECT t1.id, t1.cast_name, t1.tweet_end_id\
+            FROM twitter_cast_score t1\
+            where t1.tweet_end_id = 0\
+            limit 1"
+    else:
+        query = f"SELECT t1.id, t1.cast_name, t1.tweet_end_id\
+            FROM twitter_cast_score t1\
+            where t1.id >= {cast_id}\
+            limit 1"
+
     cur.execute(query)
     twitter_list = cur.fetchall()
-    # 
-    # print(twitter_list[0][0])
-    # input()
+
     api = get_twitter_data()
     max_id = 2650506631677968385
     current_id = api.get_current_id()
@@ -102,7 +155,6 @@ def get_twitter_cast_raw_data(cur, conn, engine):
     
     count = 0
 
-    # print(current_id)
     while True:
         print(twitter_list)
         try:
@@ -114,9 +166,15 @@ def get_twitter_cast_raw_data(cur, conn, engine):
 
         if cast_tweets is None:
             if count == 0:
-                query = f"update twitter_cast_score\
-                    set tweet_end_id = {current_id}\
-                    where twitter_cast_score.id = {twitter_list[0][0]}"
+                if current_id is not None:
+                    query = f"update twitter_cast_score\
+                        set tweet_end_id = {current_id}\
+                        where twitter_cast_score.id = {twitter_list[0][0]}"
+                else:
+                    print("default twitter end id")
+                    query = f"update twitter_cast_score\
+                        set tweet_end_id = 1654959876240441345\
+                        where twitter_cast_score.id = {twitter_list[0][0]}"
                 print(query)
                 cur.execute(query)
                 conn.commit()
@@ -144,17 +202,35 @@ def get_twitter_cast_raw_data(cur, conn, engine):
         print(count)
         if count > 3000:
             break
+    return twitter_list[0][0]
 
-def get_twitter_director_raw_data(cur, conn, engine):
-    query = "SELECT t1.id, t1.director_name, t1.tweet_end_id\
-        FROM twitter_director_score t1\
-        where t1.tweet_end_id = 0\
-        limit 1"
+def get_twitter_director_raw_data(cur, conn, engine, director_id=None):
+    '''
+    Get the twitter data from twitter search api and store it to prosgres sql.
+    It will return after getting more than 3000 tweets per director to accelerate the speed to get data from every movie.
+
+    parameters:
+        cur: psycopg2 cursor
+        conn: psycopg2 connection
+        engine: sqlalchemy engine
+        director_id: get the director data from this director id. If director id is None, will get the tweets for those director have no data.
+    return:
+        twitter_list[0][0]: the director_id get the tweets
+    '''
+
+    if director_id is None:
+        query = "SELECT t1.id, t1.director_name, t1.tweet_end_id\
+            FROM twitter_director_score t1\
+            where t1.tweet_end_id = 0\
+            limit 1"
+    else:
+        query = f"SELECT t1.id, t1.director_name, t1.tweet_end_id\
+            FROM twitter_director_score t1\
+            where t1.id >= {director_id}\
+            limit 1"
     cur.execute(query)
     twitter_list = cur.fetchall()
-    # 
-    # print(twitter_list[0][0])
-    # input()
+    
     api = get_twitter_data()
     max_id = 2650506631677968385
     current_id = api.get_current_id()
@@ -174,9 +250,15 @@ def get_twitter_director_raw_data(cur, conn, engine):
 
         if director_tweets is None:
             if count == 0:
-                query = f"update twitter_director_score\
-                    set tweet_end_id = {current_id}\
-                    where twitter_director_score.id = {twitter_list[0][0]}"
+                if current_id is not None:
+                    query = f"update twitter_director_score\
+                        set tweet_end_id = {current_id}\
+                        where twitter_director_score.id = {twitter_list[0][0]}"
+                else:
+                    print("default twitter end id")
+                    query = f"update twitter_director_score\
+                        set tweet_end_id = 1654959876240441345\
+                        where twitter_director_score.id = {twitter_list[0][0]}"
                 print(query)
                 cur.execute(query)
                 conn.commit()
@@ -204,69 +286,90 @@ def get_twitter_director_raw_data(cur, conn, engine):
         print(count)
         if count > 3000:
             break
+    return twitter_list[0][0]
 
-def get_cast_raw_sentiment(cur, conn, engine):
+def get_cast_raw_sentiment(cur, conn, trainer):
+    '''
+    get tweets from twitter_cast_raw_data and do the sentiment prediction of the tweets.
+    update the result of the prediction to twitter_cast_raw_data
+    '''
     query = "SELECT t1.id, t1.text\
             FROM twitter_cast_raw_data t1\
             Where score is NULL\
-            limit 32"
+            limit 1024"
     cur.execute(query)
     data = cleaner(cur.fetchall())
     df = pd.DataFrame(data, columns = ['id', 'text'])
-    trainer = twitter_sentiment("model/bert_v2")
+    print(data[0][0])
 
     df["score"] = trainer.predict(df)
-    for i in range(32):
-        query = f"update twitter_cast_raw_data\
-            set score = {df.iloc[i]['score']}\
-            where twitter_cast_raw_data.id = {df.iloc[i]['id']}"
-        # print(query)
-        cur.execute(query)
-        conn.commit()
-
+    df.to_sql('temp_cast_table', engine, if_exists='replace')
+    query = f"update twitter_cast_raw_data\
+        set score = temp_cast_table.score\
+        from temp_cast_table\
+        where twitter_cast_raw_data.id = temp_cast_table.id"
+    # print(query)
+    cur.execute(query)
+    conn.commit()
     return len(data)
 
-def get_movie_raw_sentiment(cur, conn, model):
+def get_movie_raw_sentiment(cur, conn, trainer):
+    '''
+    get tweets from twitter_movie_raw_data and do the sentiment prediction of the tweets.
+    update the result of the prediction to twitter_movie_raw_data
+    '''
     query = "SELECT t1.id, t1.text\
             FROM twitter_movie_raw_data t1\
             Where score is NULL\
-            limit 32"
+            limit 1024"
     cur.execute(query)
     data = cleaner(cur.fetchall())
     df = pd.DataFrame(data, columns = ['id', 'text'])
+    print(data[0][0])
 
-    df["score"] = model.predict(df)
-    for i in range(32):
-        query = f"update twitter_movie_raw_data\
-            set score = {df.iloc[i]['score']}\
-            where twitter_movie_raw_data.id = {df.iloc[i]['id']}"
-        # print(query)
-        cur.execute(query)
-        conn.commit()
-
+    df["score"] = trainer.predict(df)
+    df.to_sql('temp_movie_table', engine, if_exists='replace')
+    query = f"update twitter_movie_raw_data\
+        set score = temp_movie_table.score\
+        from temp_movie_table\
+        where twitter_movie_raw_data.id = temp_movie_table.id"
+    # print(query)
+    cur.execute(query)
+    conn.commit()
     return len(data)
 
 def get_director_raw_sentiment(cur, conn, model):
+    '''
+    get tweets from twitter_director_raw_data and do the sentiment prediction of the tweets.
+    update the result of the prediction to twitter_director_raw_data
+    '''
     query = "SELECT t1.id, t1.text\
             FROM twitter_director_raw_data t1\
             Where score is NULL\
-            limit 32"
+            ORDER BY id ASC\
+            limit 1024"
     cur.execute(query)
     data = cleaner(cur.fetchall())
     df = pd.DataFrame(data, columns = ['id', 'text'])
+    print(data[0][0])
 
     df["score"] = model.predict(df)
-    for i in range(32):
-        query = f"update twitter_director_raw_data\
-            set score = {df.iloc[i]['score']}\
-            where twitter_director_raw_data.id = {df.iloc[i]['id']}"
-        # print(query)
-        cur.execute(query)
-        conn.commit()
+    df.to_sql('temp_director_table', engine, if_exists='replace')
+    # for i in range(1024):
+    query = f"update twitter_director_raw_data\
+        set score = temp_director_table.score\
+        from temp_director_table\
+        where twitter_director_raw_data.id = temp_director_table.id"
+    # print(query)
+    cur.execute(query)
+    conn.commit()
 
     return len(data)
 
 def cleaner(tweets):
+    '''
+    clean the tweet data before the sentiment prediction
+    '''
     result = []
     for tweet in tweets:
         tmp_tweet = tweet[1].lower()
@@ -279,6 +382,9 @@ def cleaner(tweets):
     return result
 
 def get_sentiment_model(path = "model/bert_v2"):
+    '''
+    initialization of the sentiment model
+    '''
     return twitter_sentiment(path)
     
 if __name__ == "__main__":
