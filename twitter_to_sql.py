@@ -45,7 +45,7 @@ def get_twitter_movie_raw_data(cur, conn, engine):
     api = get_twitter_data()
     max_id = 2650506631677968385
     current_id = api.get_current_id()
-    time.sleep(2)
+    time.sleep(3)
     count = 0
 
     while True:
@@ -98,7 +98,7 @@ def get_twitter_cast_raw_data(cur, conn, engine):
     api = get_twitter_data()
     max_id = 2650506631677968385
     current_id = api.get_current_id()
-    time.sleep(2)
+    time.sleep(3)
     
     count = 0
 
@@ -158,7 +158,7 @@ def get_twitter_director_raw_data(cur, conn, engine):
     api = get_twitter_data()
     max_id = 2650506631677968385
     current_id = api.get_current_id()
-    time.sleep(2)
+    time.sleep(3)
     
     count = 0
 
@@ -285,7 +285,7 @@ if __name__ == "__main__":
     cur, conn, engine = connect_sql()
 
     # get cast twitter with twitter api
-    for i in range(100):
+    for i in range(1000):
         get_twitter_director_raw_data(cur, conn, engine)
 
     # model = get_sentiment_model()
