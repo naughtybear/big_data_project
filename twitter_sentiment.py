@@ -182,11 +182,10 @@ class twitter_sentiment():
 
         dataloader_pred = DataLoader(dataset_predict,
                                     sampler = RandomSampler(dataset_predict),
-                                    batch_size = 32) #since we don't have to do backpropagation for this step
+                                    batch_size = 1024) #since we don't have to do backpropagation for this step
 
         #tracking variables
-        loss_val_total = 0
-        predictions, true_vals = [], []
+        predictions = []
         
         for batch in dataloader_pred:
             
