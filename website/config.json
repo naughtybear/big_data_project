@@ -20,5 +20,11 @@
     "Thriller",
     "War",
     "Western"
-  ]
+  ],
+
+  "prepopulated_example": {
+    "movie_name": "The Shawshank Redemption",
+    "casts": "Christian Bale, Heath Ledger, Aaron Eckhart, Michael Caine, Maggie Gyllenhaal, Gary Oldman, Morgan Freeman",
+    "directors": "Christopher Nolan"
+  }
 }
