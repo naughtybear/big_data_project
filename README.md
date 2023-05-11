@@ -1,8 +1,8 @@
 # Box Office Predictor: Leveraging Twitter/Reddit and Movie Data
 
-- This project is aimed at building a machine learning model that can predict the box office performance of movies based on their social media buzz. 
+- This project is aimed at building a machine learning model that can predict the box office performance of movies based on movies features and their social media buzz. 
 
-- The project utilizes data from Twitter and Reddit to gather sentiment analysis, and various movie attributes such as cast, director, and title, to build a predictive model.
+- The project utilizes data from Twitter and Reddit to gather sentiment analysis, and various movie attributes such as cast, director, title,and runtime to build a predictive model.
 
 - The webisite will be created locally to deploy the model and to display the visualizations for more insights.
 
@@ -59,16 +59,19 @@ This part of the project involves the combination of the data collected from Red
 - Output: Estimated Revenue
 - Data Exploration: Exploration page presents dynamic data visualizations intended for data analytics.
 
+### 12. Airflow
+- Todo: 
 
 ## Usage
 
 To use this project, please follow the instructions below:
 
-1. Clone the repository to your local machine.
+1. Clone or download the repository to your local machine.
 2. Install the required dependencies.
 3. Follow the instructions in each file to run the scripts in the correct order.
 4. To run the data_collection_cleaning file, make sure you have download the files from movie_data folder.
-4. Once the data is collected, cleaned, and combined, run the model script to build and train the predictive model.
+5. Once the data is collected, cleaned, and combined, run the model script to build and train the predictive model.
+5. 
 
 ## Conclusion
 
