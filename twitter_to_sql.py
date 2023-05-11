@@ -7,6 +7,7 @@ from twitter_sentiment import twitter_sentiment
 import re
 import tweepy
 import time
+import dask.dataframe as dd
 
 def connect_sql():
     '''
@@ -62,6 +63,7 @@ def get_twitter_movie_raw_data(cur, conn, engine, movie_id=None):
         query = f"SELECT t1.id, t1.movie_title, t1.release_date, t1.tweet_end_id\
             FROM twitter_movie_score t1\
             where t1.id >= {movie_id}\
+            order by t1.id DESC\
             limit 1"
 
     cur.execute(query)
@@ -143,6 +145,7 @@ def get_twitter_cast_raw_data(cur, conn, engine, cast_id=None):
         query = f"SELECT t1.id, t1.cast_name, t1.tweet_end_id\
             FROM twitter_cast_score t1\
             where t1.id >= {cast_id}\
+            order by t1.id\
             limit 1"
 
     cur.execute(query)
@@ -227,6 +230,7 @@ def get_twitter_director_raw_data(cur, conn, engine, director_id=None):
         query = f"SELECT t1.id, t1.director_name, t1.tweet_end_id\
             FROM twitter_director_score t1\
             where t1.id >= {director_id}\
+            order by t1.id DESC\
             limit 1"
     cur.execute(query)
     twitter_list = cur.fetchall()
@@ -298,8 +302,15 @@ def get_cast_raw_sentiment(cur, conn, trainer):
             Where score is NULL\
             limit 1024"
     cur.execute(query)
-    data = cleaner(cur.fetchall())
+    data = cur.fetchall()
     df = pd.DataFrame(data, columns = ['id', 'text'])
+    ddf = dd.from_pandas(df, npartitions=10)
+
+    # Apply the cleaner function to the 'tweets' column of the Dask dataframe
+    ddf['text'] = ddf['text'].apply(cleaner, meta=('text', 'object'))
+
+    # Convert the Dask dataframe back to a Pandas dataframe
+    df = ddf.compute()
     print(data[0][0])
 
     df["score"] = trainer.predict(df)
@@ -323,8 +334,15 @@ def get_movie_raw_sentiment(cur, conn, trainer):
             Where score is NULL\
             limit 1024"
     cur.execute(query)
-    data = cleaner(cur.fetchall())
+    data = cur.fetchall()
     df = pd.DataFrame(data, columns = ['id', 'text'])
+    ddf = dd.from_pandas(df, npartitions=10)
+
+    # Apply the cleaner function to the 'tweets' column of the Dask dataframe
+    ddf['text'] = ddf['text'].apply(cleaner, meta=('text', 'object'))
+
+    # Convert the Dask dataframe back to a Pandas dataframe
+    df = ddf.compute()
     print(data[0][0])
 
     df["score"] = trainer.predict(df)
@@ -349,8 +367,15 @@ def get_director_raw_sentiment(cur, conn, model):
             ORDER BY id ASC\
             limit 1024"
     cur.execute(query)
-    data = cleaner(cur.fetchall())
+    data = cur.fetchall()
     df = pd.DataFrame(data, columns = ['id', 'text'])
+    ddf = dd.from_pandas(df, npartitions=10)
+
+    # Apply the cleaner function to the 'tweets' column of the Dask dataframe
+    ddf['text'] = ddf['text'].apply(cleaner, meta=('text', 'object'))
+
+    # Convert the Dask dataframe back to a Pandas dataframe
+    df = ddf.compute()
     print(data[0][0])
 
     df["score"] = model.predict(df)
@@ -366,39 +391,125 @@ def get_director_raw_sentiment(cur, conn, model):
 
     return len(data)
 
-def cleaner(tweets):
-    '''
-    clean the tweet data before the sentiment prediction
-    '''
-    result = []
-    for tweet in tweets:
-        tmp_tweet = tweet[1].lower()
-        tmp_tweet = re.sub("@[A-Za-z0-9]+","",tmp_tweet) #Remove @ sign
-        tmp_tweet = re.sub(r"(?:\@|http?\://|https?\://|www)\S+", "", tmp_tweet) #Remove http links
-        tmp_tweet = " ".join(tmp_tweet.split())
-        tmp_tweet = tmp_tweet.replace("#", "").replace("_", " ") #Remove hashtag sign but keep the text
-        result.append([tweet[0], tmp_tweet])
-
-    return result
+def cleaner(tmp_tweet):
+    tmp_tweet = tmp_tweet.lower()
+    tmp_tweet = re.sub("@[A-Za-z0-9]+","",tmp_tweet) #Remove @ sign
+    tmp_tweet = re.sub(r"(?:\@|http?\://|https?\://|www)\S+", "", tmp_tweet) #Remove http links
+    tmp_tweet = " ".join(tmp_tweet.split())
+    tmp_tweet = tmp_tweet.replace("#", "").replace("_", " ") #Remove hashtag sign but keep the text
+    return tmp_tweet
 
 def get_sentiment_model(path = "model/bert_v2"):
     '''
     initialization of the sentiment model
     '''
     return twitter_sentiment(path)
+
+def calculate_cast_score(cur, conn):
+    query = "with cast_average_score as (\
+                select t1.cast_id, avg(t1.score) - 1 as avg_score\
+                from twitter_cast_raw_data as t1\
+                where t1.score is not null\
+                group by t1.cast_id\
+            )\
+            \
+            update twitter_cast_score\
+            set score = cast_average_score.avg_score\
+            from cast_average_score\
+            where id = cast_average_score.cast_id"
+    cur.execute(query)
+    conn.commit()
+
+def calculate_director_score(cur, conn):
+    query = "with director_average_score as (\
+                select t1.director_id, avg(t1.score) - 1 as avg_score\
+                from twitter_director_raw_data as t1\
+                where t1.score is not null\
+                group by t1.director_id\
+            )\
+            \
+            update twitter_director_score\
+            set score = director_average_score.avg_score\
+            from director_average_score\
+            where id = director_average_score.director_id"
+    cur.execute(query)
+    conn.commit()
+
+def calculate_movie_score(cur, conn):
+    query = "with movie_average_score as (\
+                select t1.movie_id, avg(t1.score) - 1 as avg_score\
+                from twitter_movie_raw_data as t1\
+                where t1.score is not null\
+                group by t1.movie_id\
+            )\
+            \
+            update twitter_movie_score\
+            set score = movie_average_score.avg_score\
+            from movie_average_score\
+            where id = movie_average_score.movie_id"
+    cur.execute(query)
+    conn.commit()
+
     
 if __name__ == "__main__":
     cur, conn, engine = connect_sql()
 
-    # get cast twitter with twitter api
-    for i in range(1000):
+    # initial director twitter with twitter api
+    for i in range(10):
         get_twitter_director_raw_data(cur, conn, engine)
+    
+    # update director twitter with twitter api
+    current_id = 0
+    for i in range(10):
+        current_id = get_twitter_director_raw_data(cur, conn, engine, current_id)
+        current_id = current_id + 1
 
+    # sentiment prediction for each tweet about directors
+    model = get_sentiment_model()
+    for i in range(10):
+        length = get_director_raw_sentiment(cur, conn, model)
+        if(length < 1024):
+            break
+
+    # calculate the score of directors
+    calculate_director_score(cur, conn)
+
+    # # initial cast twitter with twitter api
+    # for i in range(10):
+    #     get_twitter_cast_raw_data(cur, conn, engine)
+    
+    # # update cast twitter with twitter api
+    # current_id = 0
+    # for i in range(10):
+    #     current_id = get_twitter_cast_raw_data(cur, conn, engine, current_id)
+    #     current_id = current_id + 1
+
+    # # sentiment prediction for each tweet about casts
     # model = get_sentiment_model()
-    # total = 0
-    # while True:
-    #     length = get_movie_raw_sentiment(cur, conn, model)
-    #     print(total)
-    #     total = total + length
-    #     if(length < 32):
+    # for i in range(10):
+    #     length = get_cast_raw_sentiment(cur, conn, model)
+    #     if(length < 1024):
     #         break
+
+    # # calculate the score of movies
+    # calculate_movie_score(cur, conn)
+
+    # # initial movie twitter with twitter api
+    # for i in range(10):
+    #     get_twitter_movie_raw_data(cur, conn, engine)
+    
+    # # update movie twitter with twitter api
+    # current_id = 0
+    # for i in range(10):
+    #     current_id = get_twitter_movie_raw_data(cur, conn, engine, current_id)
+    #     current_id = current_id + 1
+
+    # # sentiment prediction for each tweet about movies
+    # model = get_sentiment_model()
+    # for i in range(10):
+    #     length = get_movie_raw_sentiment(cur, conn, model)
+    #     if(length < 1024):
+    #         break
+
+    # # calculate the score of movies
+    # calculate_movie_score(cur, conn)
