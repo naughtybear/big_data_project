@@ -145,7 +145,7 @@ def get_twitter_cast_raw_data(cur, conn, engine, cast_id=None):
         query = f"SELECT t1.id, t1.cast_name, t1.tweet_end_id\
             FROM twitter_cast_score t1\
             where t1.id >= {cast_id}\
-            order by t1.id\
+            order by t1.id ASC\
             limit 1"
 
     cur.execute(query)
@@ -230,7 +230,7 @@ def get_twitter_director_raw_data(cur, conn, engine, director_id=None):
         query = f"SELECT t1.id, t1.director_name, t1.tweet_end_id\
             FROM twitter_director_score t1\
             where t1.id >= {director_id}\
-            order by t1.id DESC\
+            order by t1.id ASC\
             limit 1"
     cur.execute(query)
     twitter_list = cur.fetchall()
@@ -455,8 +455,8 @@ if __name__ == "__main__":
     cur, conn, engine = connect_sql()
 
     # initial director twitter with twitter api
-    for i in range(10):
-        get_twitter_director_raw_data(cur, conn, engine)
+    # for i in range(10):
+    #     get_twitter_director_raw_data(cur, conn, engine)
     
     # update director twitter with twitter api
     current_id = 0
