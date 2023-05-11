@@ -1,4 +1,4 @@
-# Box Office Predictor using Twitter and Reddit and Movie Data
+# Box Office Predictor: Leveraging Twitter/Reddit and Movie Data
 
 - This project is aimed at building a machine learning model that can predict the box office performance of movies based on their social media buzz. 
 
@@ -15,7 +15,6 @@ The project consists of the following parts:
 - This part of the project involves the collection of data from movies datasets,TMDB,IMDB, using their respective APIs. The collected data is then cleaned to remove irrelevant information and prepare it for further processing.
 - Gather essential movie details, such as casts, director, genres, budgets, ratings, etc.
 - Retrieve new movie data from the TMDB dataset API in a period of time.
-
 
 ### 2. Reddit Casts Sentiment
 
