@@ -5,6 +5,8 @@
 - The project utilizes data from Twitter and Reddit to gather sentiment analysis, and various movie attributes such as cast, director, title,and runtime to build a predictive model.
 
 - The webisite will be created locally to deploy the model and to display the visualizations for more insights.
+## Project Group Members
+Hongjie Huang, Po Yen Chen, Yizheng Wang, Rahul Raj, Pulkit Khandelwal
 
 ## Parts of the Project
 
@@ -12,14 +14,15 @@ The project consists of the following parts:
 
 ### 1. Data Collection and Cleaning
 
-- This part of the project involves the collection of data from movies datasets,TMDB,IMDB, using their respective APIs. The collected data is then cleaned to remove irrelevant information and prepare it for further processing.
+- This part of the project involves the collection and cleanning of data from kaggle movies datasets and TMDB,IMDB APIs. 
+- The collected data will be cleaned, transformed, and standardized and be saved into the table in database for further processing.
 - Gather essential movie details, such as casts, director, genres, budgets, ratings, etc.
-- Retrieve new movie data from the TMDB dataset API in a period of time.
+- Retrieve new movie data from the TMDB dataset API in a period of time, and fill out missing data using IMDB API.
 
 ### 2. Reddit Casts Sentiment
 
-This part of the project analyzes the sentiment of the comments on Reddit related to the cast of a particular movie.
-
+- This part of the project analyzes the sentiment of the comments on Reddit related to the cast of a particular movie.
+- For each movie title/director/actor, we retrieve about 1000 latest comments. 
 ### 3. Reddit Director Sentiment
 
 This part of the project analyzes the sentiment of the comments on Reddit related to the director of a particular movie.
