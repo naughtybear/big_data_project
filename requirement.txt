@@ -1,0 +1,10 @@
+psycopg2-binary
+torch
+transformers
+numpy
+pandas
+tweepy
+dask
+scikit-learn
+tqdm
+sqlalchemy

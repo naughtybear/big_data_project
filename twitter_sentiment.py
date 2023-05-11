@@ -1,4 +1,4 @@
-# BERT model : https://drive.google.com/drive/folders/1-AcxBlfmHCKR1w9HGlNE7FyRZt0zn357?usp=sharing
+# BERT model : https://drive.google.com/drive/folders/1C_b4g5G_eSZzA97pGpyvhM0x6AxLExI2?usp=sharing
 from transformers import DistilBertForSequenceClassification, get_linear_schedule_with_warmup, DistilBertTokenizer
 import pandas as pd
 # from torch import DataLoader, RandomSampler

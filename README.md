@@ -6,6 +6,9 @@
 
 - The webisite will be created locally to deploy the model and to display the visualizations for more insights.
 
+## ETL Diagram
+![image](/photo/box_office_etl.png)
+
 ## Parts of the Project
 
 The project consists of the following parts:
@@ -34,7 +37,9 @@ This part of the project involves the creation of a function that gathers data f
 
 ### 6. Twitter Sentiment
 
-This part of the project analyzes the sentiment of the tweets related to a particular movie,cast and director.
+This is the class that handling the tweets sentiment prediction.
+
+Need to download the bert_v2 folder from [here](https://drive.google.com/drive/folders/1C_b4g5G_eSZzA97pGpyvhM0x6AxLExI2?usp=sharing), and put it in the model folder.
 
 ### 7. Twitter to SQL
 
