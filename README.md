@@ -67,7 +67,39 @@ This part of the project involves the combination of the data collected from Red
 ### 8. Airflow
 Using Airflow to monitor and schedule ETL pipelines. The reddit and twitter pieplines are triggered daily to fetch latest sentiments of the public that is feeded into the model to improve its accuracy.
 
-To manually trigger the model, spin up a airflow container on docker and trigger the DAG on the airflow UI. For setting up the airflow container, refer a tutorial.
+To manually trigger the model, spin up a airflow container on docker and trigger the DAG on the airflow UI. For setting up the airflow container, follow the below steps or refer a detailed turotial (https://www.youtube.com/watch?v=K9AnJ9_ZAXE&t=4281s&ab_channel=coder2j) -
+
+1) Install Docker: Download and install Docker Desktop from the official Docker website if you haven't already.
+
+2) Install VSCode: Download and install VSCode from the official Visual Studio Code website if you haven't already.
+
+3) Install Docker Extension in VSCode: Open VSCode, go to the Extensions view (View -> Extensions or Ctrl+Shift+X), and search for Docker. Install the Docker extension by Microsoft.
+
+4) Pull the Apache Airflow Docker image: Open a terminal (you can use the built-in terminal in VSCode) and run the following command to pull the Apache Airflow image from Docker Hub: 
+
+  `docker pull apache/airflow:2.2.2-python3.8`
+  
+  Remember to replace 2.2.2-python3.8 with the tag of the Airflow version you want to use.
+  
+5) Create a Dockerfile: Create a new file in your project directory named Dockerfile and put the following content in it:
+
+```
+FROM apache/airflow:2.6.0
+COPY requirements.txt /requirements.txt
+RUN pip3 install --user --upgrade pip
+RUN pip3 install --no-cache-dir --user -r /requirements.txt
+```
+
+Run the command: 
+
+`docker build . --tag extending_airflow:latest`
+
+6) Run the Docker container:
+
+`docker-compose up -d`
+
+7) On the browser go to http://localhost:8080/
+
 
 ![image](https://github.com/naughtybear/big_data_project/assets/25876670/e5aa5ec8-59da-4d70-aea0-b0322ac1c940)
 
