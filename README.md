@@ -9,14 +9,13 @@
 Hongjie Huang, Po Yen Chen, Yizheng Wang, Rahul Raj, Pulkit Khandelwal
 
 ### Table of Contents
-- [ETL Diagram](#ETLDiagram)
-- [Parts of the Project](#PartsoftheProject)
+- [ETL Diagram](#etl-diagram-)
+- [Parts of the Project](#parts-of-the-project-)
 
-## ETL Diagram <a name="ETLDiagram"></a>
+## ETL Diagram <a name="etl-diagram-"></a>
 ![image](/photo/box_office_etl.png)
 
-## Parts of the Project <a name="PartsoftheProject"></a>
-
+## Parts of the Project <a name="parts-of-the-project-"></a>
 The project consists of the following parts:
 
 ### 1. Data Collection and Cleaning
