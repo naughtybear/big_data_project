@@ -49,7 +49,7 @@ def get_results(movie_name, director, casts, budget, released_date, genres, runt
     twitter_scores, reddit_scores = scores.get_sentiment_scores(
         movie_name, director, casts)
     print("Predicting revenue")
-    revenue = predict.predict(X, reddit_scores, twitter_scores)
+    revenue = predict.predict(X, twitter_scores, reddit_scores)
     return revenue, reddit_scores, twitter_scores
 
 

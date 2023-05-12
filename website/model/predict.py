@@ -42,28 +42,10 @@ def predict(X, twitter_score, reddit_score):
 
     # Create a dummy input for the model
     # Replace the values in the array with the actual values for the features
-    dummy_input = np.array([[
-        340000000.0, # budget
-        10.892, # popularity
-        81.0, # runtime
-        3.966, # vote_average
-        250.0, # vote_count
-        0.0, # rating
-        0.0, # twitter_movie_score
-        0.044497194648252, # twitter_cast_average_score
-        0.3129770992366412, # twitter_director_score
-        0.4369369369369369, # reddit_movie_score
-        0.5351854283457296, # reddit_cast_average_score
-        0.2815533980582524, # reddit_director_score
-        2.73857322141759, # log_revenue
-        3.216707972959764, # log_budget
-        1.0, # has_homepage (True, since there's a homepage in the JSON)
-        *date_features, # Unpack the date_features list
-        *genre_encoding # Unpack the genre_encoding list
-    ]])
+    model_input = np.array([[ X[0][3], 10.892, X[0][6], 3.966, 250.0, 0.0, twitter_score[0], twitter_score[1], twitter_score[2], reddit_score[0], reddit_score[1], reddit_score[2], 2.73857322141759, 3.216707972959764, 1.0, *date_features, *genre_encoding ]])
 
     # Make a prediction using the dummy input
-    revenue_prediction = clf.predict(dummy_input)[0]
+    revenue_prediction = clf.predict(model_input)[0]
     print(f"Predicted revenue: {revenue_prediction}")
 
     return revenue_prediction
