@@ -66,6 +66,8 @@ This part of the project involves the combination of the data collected from Red
 - Required Model Inputs: Movie Name, Director, Casts, Budget, Released Date, Genres, Runtime
 - Output: Estimated Revenue
 - Data Exploration: Exploration page presents dynamic data visualizations intended for data analytics.
+<img width="1456" alt="Screenshot 2023-05-11 at 10 11 28 PM" src="https://github.com/naughtybear/big_data_project/assets/30201131/415563f9-7a25-4238-a9a7-7731d14d41db">
+<img width="1470" alt="Screenshot 2023-05-11 at 10 12 29 PM" src="https://github.com/naughtybear/big_data_project/assets/30201131/ea720045-89a7-4e2e-a351-16dbc729717e">
 
 ### 12. Airflow
 - Todo: 
@@ -79,8 +81,13 @@ To use this project, please follow the instructions below:
 3. Follow the instructions in each file to run the scripts in the correct order.
 4. To run the data_collection_cleaning file, make sure you have download the files from movie_data folder.
 5. Once the data is collected, cleaned, and combined, run the model script to build and train the predictive model.
-5. 
-
+5. For running inference and checking out visualizations, you can run the website using the following commands in the terminal:
+```
+pip install streamlit
+cd website
+streamlit run home.py
+```
+Head over to http://localhost:8501 if not automatically redirected.
 ## Conclusion
 
 The Box Office Predictor using Twitter and Reddit and Movie Data is a useful tool for predicting the box office performance of movies. By leveraging sentiment analysis on social media and various movie attributes, this project provides some valuable insights into a movie's potential success.
