@@ -55,7 +55,9 @@ This part of the project involves the combination of the data collected from Red
 <img width="1470" alt="Screenshot 2023-05-11 at 10 12 29 PM" src="https://github.com/naughtybear/big_data_project/assets/30201131/ea720045-89a7-4e2e-a351-16dbc729717e">
 
 ### 8. Airflow
-![image](/photo/airflow.png)
+Using Airflow to monitor pipelines. Here is the ETL pipeline
+
+![image](https://github.com/naughtybear/big_data_project/assets/25876670/e5aa5ec8-59da-4d70-aea0-b0322ac1c940)
 
 ## Usage
 
