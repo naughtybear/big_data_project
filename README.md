@@ -67,6 +67,8 @@ This part of the project involves the combination of the data collected from Red
 ### 8. Airflow
 Using Airflow to monitor and schedule ETL pipelines. The reddit and twitter pieplines are triggered daily to fetch latest sentiments of the public that is feeded into the model to improve its accuracy.
 
+To manually trigger the model, spin up a airflow container on docker and trigger the DAG on the airflow UI. For setting up the airflow container, refer a tutorial.
+
 ![image](https://github.com/naughtybear/big_data_project/assets/25876670/e5aa5ec8-59da-4d70-aea0-b0322ac1c940)
 
 ## Usage <a name="usage"></a>
