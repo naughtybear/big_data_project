@@ -4,7 +4,7 @@ import pandas as pd
 
 
 class get_twitter_data():
-    def __init__(self, credential_file="twitter_api_key.json"):
+    def __init__(self, credential_file="plugins/twitter/twitter_api_key.json"):
         with open(credential_file, "r") as file_content:
             cred = json.load(file_content)
             self.access_token = cred['key1']["Access Token"]
