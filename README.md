@@ -11,6 +11,8 @@ Hongjie Huang, Po Yen Chen, Yizheng Wang, Rahul Raj, Pulkit Khandelwal
 ### Table of Contents
 - [ETL Diagram](#etl-diagram-)
 - [Parts of the Project](#parts-of-the-project-)
+- [Usage](#usage)
+- [Conclusion](#conclusion)
 
 ## ETL Diagram <a name="etl-diagram-"></a>
 ![image](/photo/box_office_etl.png)
@@ -67,7 +69,7 @@ Using Airflow to monitor pipelines. Here is the ETL pipeline
 
 ![image](https://github.com/naughtybear/big_data_project/assets/25876670/e5aa5ec8-59da-4d70-aea0-b0322ac1c940)
 
-## Usage
+## Usage <a name="usage"></a>
 
 To use this project, please follow the instructions below:
 
@@ -83,6 +85,7 @@ cd website
 streamlit run home.py
 ```
 Head over to http://localhost:8501 if not automatically redirected.
-## Conclusion
+
+## Conclusion <a name="conclusion"></a>
 
 The Box Office Predictor using Twitter and Reddit and Movie Data is a useful tool for predicting the box office performance of movies. By leveraging sentiment analysis on social media and various movie attributes, this project provides some valuable insights into a movie's potential success.
