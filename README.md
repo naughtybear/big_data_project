@@ -8,10 +8,14 @@
 ## Project Group Members
 Hongjie Huang, Po Yen Chen, Yizheng Wang, Rahul Raj, Pulkit Khandelwal
 
-## ETL Diagram
-![image](/photo/box_office_etl2.png)
+### Table of Contents
+- [ETL Diagram](#ETLDiagram)
+- [Parts of the Project](#PartsoftheProject)
 
-## Parts of the Project
+## ETL Diagram <a name="ETLDiagram"></a>
+![image](/photo/box_office_etl.png)
+
+## Parts of the Project <a name="PartsoftheProject"></a>
 
 The project consists of the following parts:
 
