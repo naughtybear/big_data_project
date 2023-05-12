@@ -9,7 +9,7 @@
 Hongjie Huang, Po Yen Chen, Yizheng Wang, Rahul Raj, Pulkit Khandelwal
 
 ## ETL Diagram
-![image](/photo/box_office_etl.png)
+![image](/photo/box_office_etl2.png)
 
 ## Parts of the Project
 
