@@ -31,8 +31,8 @@ def predict(X, twitter_score, reddit_score):
     clf = load_model()
     
     # Get the genre_text and date from X
-    genres = X[0][5]
-    date = X[0][4]
+    genres = X['genres'].iloc[0]
+    date = X['released_date'].iloc[0]
 
     # Get the one-hot encoding for the genre
     genre_encoding = get_genres_encoding(genres, config)
@@ -42,7 +42,7 @@ def predict(X, twitter_score, reddit_score):
 
     # Create a dummy input for the model
     # Replace the values in the array with the actual values for the features
-    model_input = np.array([[ X[0][3], 10.892, X[0][6], 3.966, 250.0, 0.0, twitter_score[0], twitter_score[1], twitter_score[2], reddit_score[0], reddit_score[1], reddit_score[2], 2.73857322141759, 3.216707972959764, 1.0, *date_features, *genre_encoding ]])
+    model_input = np.array([[ X['budget'].iloc[0], 10.892, X['runtime'].iloc[0], 3.966, 250.0, 0.0, twitter_score[0], twitter_score[1], twitter_score[2], reddit_score[0], reddit_score[1], reddit_score[2], 2.73857322141759, 3.216707972959764, 1.0, *date_features, *genre_encoding ]])
 
     # Make a prediction using the dummy input
     revenue_prediction = clf.predict(model_input)[0]

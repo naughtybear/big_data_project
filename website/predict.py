@@ -42,8 +42,11 @@ def display_results(revenue, reddit_scores, twitter_scores):
 
 
 def get_results(movie_name, director, casts, budget, released_date, genres, runtime):
-    X = np.array(
-        [[movie_name, director, casts, budget, released_date, genres, runtime]])
+    X = pd.DataFrame(
+        [[movie_name, director, casts, budget, released_date, genres, runtime]],
+        columns=['movie_name', 'director', 'casts',
+                 'budget', 'released_date', 'genres', 'runtime']
+    )
 
     print("Fetching sentiment scores")
     twitter_scores, reddit_scores = scores.get_sentiment_scores(
