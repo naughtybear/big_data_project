@@ -76,7 +76,7 @@ To use this project, please follow the instructions below:
 1. Clone or download the repository to your local machine.
 2. Install the required dependencies.
 3. Follow the instructions in each file to run the scripts in the correct order.
-4. To run the data_collection_cleaning file, make sure you have download the files from movie_data folder.
+4. To run the data_collection_cleaning file, make sure you have download the files from movie_data folder [here](https://drive.google.com/drive/folders/1trVpELkGYP-YTVQBEVk2MJ36ROYu5wcC?usp=sharing).
 5. Once the data is collected, cleaned, and combined, run the model script to build and train the predictive model.
 5. For running inference and checking out visualizations, you can run the website using the following commands in the terminal:
 ```
