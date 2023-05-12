@@ -22,46 +22,31 @@ The project consists of the following parts:
 - Gather essential movie details, such as casts, director, genres, budgets, ratings, etc.
 - Retrieve new movie data from the TMDB dataset API in a period of time, and fill out missing data using IMDB API.
 
-### 2. Reddit Casts Sentiment
+### 2. Reddit
+- This part of the project involves collecting the latest comments related to a movie title, director or cast from Reddit.
+  * Reddit Casts Sentiment: This part of the project analyzes the sentiment of the comments on Reddit related to the individual cast.
+  * Reddit Director Sentiment: This part of the project analyzes the sentiment of the comments on Reddit related to the director name.
+  * Reddit Movie Title Sentiment: This part of the project analyzes the sentiment of the comments on Reddit related to the title of a particular movie.
 
-- This part of the project analyzes the sentiment of the comments on Reddit related to the cast of a particular movie.
-- For each movie title/director/actor, we retrieve about 1000 latest comments. 
-### 3. Reddit Director Sentiment
+### 3. Twitter
+  * Twitter Function: This part of the project involves the creation of a function that gathers data from Twitter using its API.
+  * Twitter Sentiment: This is the class that handling the tweets sentiment prediction. Need to download the bert_v2 folder from [here](https://drive.google.com/drive/folders/1C_b4g5G_eSZzA97pGpyvhM0x6AxLExI2?usp=sharing), and put it in the model folder.
+  * Twitter to SQL: This part of the project involves storing the collected Twitter data into a SQL database.
 
-This part of the project analyzes the sentiment of the comments on Reddit related to the director of a particular movie.
-
-### 4. Reddit Movie Title Sentiment
-
-This part of the project analyzes the sentiment of the comments on Reddit related to the title of a particular movie.
-
-### 5. Twitter Function
-
-This part of the project involves the creation of a function that gathers data from Twitter using its API.
-
-### 6. Twitter Sentiment
-
-This is the class that handling the tweets sentiment prediction.
-
-Need to download the bert_v2 folder from [here](https://drive.google.com/drive/folders/1C_b4g5G_eSZzA97pGpyvhM0x6AxLExI2?usp=sharing), and put it in the model folder.
-
-### 7. Twitter to SQL
-
-This part of the project involves storing the collected Twitter data into a SQL database.
-
-### 8. Cloud SQL Connection
+### 4. Cloud SQL Connection
 
 This part of the project involves the example of connection to the SQL database in the cloud.
 
-### 9. Combine Data
+### 5. Combine Data
 
 This part of the project involves the combination of the data collected from Reddit and Twitter and movies datasets.
 
-### 10. Model
+### 6. Model
 
 - This part of the project involves the analysis of features, creation of visualizations and several machine learning models that can predict the box office performance of a movie based on the combined data.
 - The best performing model will be choosed and used in the website.
 
-### 11. Website
+### 7. Website
 - The website is built using Streamlit because it facilitates easy and rapid web development enabling developers to focus on the data and machine learning aspects.
 - Required Model Inputs: Movie Name, Director, Casts, Budget, Released Date, Genres, Runtime
 - Output: Estimated Revenue
@@ -69,8 +54,8 @@ This part of the project involves the combination of the data collected from Red
 <img width="1456" alt="Screenshot 2023-05-11 at 10 11 28 PM" src="https://github.com/naughtybear/big_data_project/assets/30201131/415563f9-7a25-4238-a9a7-7731d14d41db">
 <img width="1470" alt="Screenshot 2023-05-11 at 10 12 29 PM" src="https://github.com/naughtybear/big_data_project/assets/30201131/ea720045-89a7-4e2e-a351-16dbc729717e">
 
-### 12. Airflow
-- Todo: 
+### 8. Airflow
+![image](/photo/airflow.png)
 
 ## Usage
 
