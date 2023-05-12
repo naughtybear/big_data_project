@@ -47,7 +47,8 @@ This part of the project involves the combination of the data collected from Red
 - The best performing model will be choosed and used in the website.
 
 ### 7. Website
-- The website is built using Streamlit because it facilitates easy and rapid web development enabling developers to focus on the data and machine learning aspects.
+- The final application will be built using react+flask for a full-fledged website (React+Flask ensure rapid development and are a commonly used tech stack for ML platforms which ensures great community support. (We use streamlit for this POC but according to the professor's feedback we have updated the ETL diagram to represent the ideal tech stack on production).
+- For the POC, the website is built using Streamlit because it facilitates easy and rapid web development enabling developers to focus on the data and machine learning aspects.
 - Required Model Inputs: Movie Name, Director, Casts, Budget, Released Date, Genres, Runtime
 - Output: Estimated Revenue
 - Data Exploration: Exploration page presents dynamic data visualizations intended for data analytics.
