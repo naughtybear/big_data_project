@@ -59,6 +59,7 @@ def get_results(movie_name, director, casts, budget, released_date, genres, runt
 def render_input_form():
     movie_name = st.text_input(
         "Movie Name", config['prepopulated_example']['movie_name'], key="movie_name_input")
+    
     director = st.text_input("Directors (separate names with commas)",
                              config['prepopulated_example']['directors'], key="director_input")
     casts = st.text_input("Casts (separate names with commas)",
