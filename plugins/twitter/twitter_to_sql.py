@@ -2,8 +2,14 @@ import psycopg2
 import pandas as pd
 import sqlalchemy
 import numpy as np
-from twitter_function import get_twitter_data
-from twitter_sentiment import twitter_sentiment
+
+import os, sys
+
+project_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.append(project_directory)
+
+from plugins.twitter.twitter_function import get_twitter_data
+from plugins.twitter.twitter_sentiment import twitter_sentiment
 import re
 import tweepy
 import time
@@ -356,6 +362,9 @@ def get_movie_raw_sentiment(cur, conn, trainer):
     conn.commit()
     return len(data)
 
+def preprocess_data():
+    pass
+
 def get_director_raw_sentiment(cur, conn, model):
     '''
     get tweets from twitter_director_raw_data and do the sentiment prediction of the tweets.
@@ -399,7 +408,7 @@ def cleaner(tmp_tweet):
     tmp_tweet = tmp_tweet.replace("#", "").replace("_", " ") #Remove hashtag sign but keep the text
     return tmp_tweet
 
-def get_sentiment_model(path = "model/bert_v2"):
+def get_sentiment_model(path = "plugins/twitter/model/bert_v2"):
     '''
     initialization of the sentiment model
     '''
@@ -450,29 +459,40 @@ def calculate_movie_score(cur, conn):
     cur.execute(query)
     conn.commit()
 
-    
-if __name__ == "__main__":
+def func_get_twitter_director_raw_data():
     cur, conn, engine = connect_sql()
-
-    # initial director twitter with twitter api
-    # for i in range(10):
-    #     get_twitter_director_raw_data(cur, conn, engine)
-    
-    # update director twitter with twitter api
     current_id = 0
     for i in range(10):
         current_id = get_twitter_director_raw_data(cur, conn, engine, current_id)
         current_id = current_id + 1
 
-    # sentiment prediction for each tweet about directors
+def func_get_director_raw_sentiment():
+    cur, conn, engine = connect_sql()
     model = get_sentiment_model()
     for i in range(10):
         length = get_director_raw_sentiment(cur, conn, model)
         if(length < 1024):
             break
 
-    # calculate the score of directors
+def func_calculate_director_score():
+    cur, conn, engine = connect_sql()
     calculate_director_score(cur, conn)
+
+def main():
+    # cur, conn, engine = connect_sql()
+
+    # initial director twitter with twitter api
+    # for i in range(10):
+    #     get_twitter_director_raw_data(cur, conn, engine)
+    
+    # update director twitter with twitter api
+    func_get_twitter_director_raw_data()
+
+    # sentiment prediction for each tweet about directors
+    func_get_director_raw_sentiment()
+
+    # calculate the score of directors
+    func_calculate_director_score()
 
     # # initial cast twitter with twitter api
     # for i in range(10):
@@ -513,3 +533,6 @@ if __name__ == "__main__":
 
     # # calculate the score of movies
     # calculate_movie_score(cur, conn)
+    
+if __name__ == "__main__":
+    main()
