@@ -33,6 +33,10 @@ The project consists of the following parts:
   * Reddit Movie Title Sentiment: This part of the project analyzes the sentiment of the comments on Reddit related to the title of a particular movie.
 
 ### 3. Twitter
+Install the requirement package through:
+```
+pip install -r requirement.txt
+```
   * Twitter Function: This part of the project involves the creation of a function that gathers data from Twitter using its API.
   * Twitter Sentiment: This is the class that handling the tweets sentiment prediction. Need to download the bert_v2 folder from [here](https://drive.google.com/drive/folders/1C_b4g5G_eSZzA97pGpyvhM0x6AxLExI2?usp=sharing), and put it in the model folder.
   * Twitter to SQL: This part of the project involves storing the collected Twitter data into a SQL database.
